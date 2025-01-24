@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ClientSchema = new mongoose.Schema({
   id: { type: Number, required: true },

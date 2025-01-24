@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const MessageSchema = new mongoose.Schema({
   autor: { type: String, required: true }, // Puede ser un número o un ID de usuario

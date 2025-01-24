@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
+
 const ClientSchema = require("./Client.model.js");
 const UserSchema = require("./User.model");
 const MessageSchema = require("./Message.model");
@@ -8,7 +9,7 @@ const RedirectionSchema = require("./Redirection.model");
 const ConversationSchema = new mongoose.Schema({
     id_conversacion: { type: Number, required: true },
     tipo: {
-      id: { type: Number, required: true },
+      id: {  type: Number, required: true },
       descripcion: { type: String, required: true },
     },
     cliente: ClientSchema,
