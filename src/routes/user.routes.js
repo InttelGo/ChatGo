@@ -1,11 +1,21 @@
 import { Router } from "express";
-import { 
-    verifyUser,
-    getUser
+import { authRequired, rolRequired } from "../middlewares/validateToken.js";
+
+import {
+    desactiveUser,
+    getProfile,
+    updatedAttributes,
+    register
 } from "../controllers/user.controller.js";
+
 const router = Router();
 
-router.post('/user/login/', verifyUser);
-router.get('/user/', getUser);
+router.post("/desactive", authRequired, rolRequired, desactiveUser);
+
+router.post("/uploaded", authRequired, rolRequired, updatedAttributes);
+
+router.post("/register", authRequired, rolRequired, register);
+
+router.get("/consultprofile", authRequired, rolRequired, getProfile);
 
 export default router;
