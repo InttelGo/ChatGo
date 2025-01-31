@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import ScrollableButtons  from "../components/ScrollableButtons";
+import ScrollableButtons from "../components/ScrollableButtons";
 const HomePage = () => {
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
@@ -89,12 +89,42 @@ const HomePage = () => {
 
           {/* Chat Section */}
           <div className="col d-flex flex-column">
-            <div className="bg-white p-3 border-bottom d-flex align-items-center">
-              <div
-                className="rounded-circle bg-secondary me-2"
-                style={{ width: 40, height: 40 }}
-              ></div>
-              <strong>+57 3000-000-000</strong>
+            <div className="bg-white p-3 border-bottom d-flex align-items-center justify-content-between w-100">
+              <div className="d-flex align-items-center">
+                <div
+                  className="rounded-circle bg-secondary me-2"
+                  style={{ width: 40, height: 40 }}
+                ></div>
+                <strong>+57 3000-000-000</strong>
+              </div>
+              <div className="buttons d-flex align-items-center">
+                <button className="primary-button">
+                  <span
+                    className="material-symbols-rounded"
+                    style={{
+                      fontSize: "1.7em",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    Search
+                  </span>
+                </button>
+                <button className="primary-button">
+                  <span
+                    className="material-symbols-rounded"
+                    style={{
+                      fontSize: "1.7em",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    more_vert
+                  </span>
+                </button>
+              </div>
             </div>
             <div className="flex-grow-1 p-3 overflow-auto">
               {/* Messages */}

@@ -15,7 +15,13 @@ const app = express();
 
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    callback(null, origin || "*"); // Permitir cualquier origen
+  },
+  credentials: true, // Permitir envío de cookies
+}));
+
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(express.json());

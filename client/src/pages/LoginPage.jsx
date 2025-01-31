@@ -7,19 +7,24 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [seePassword, setSeePassword] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const { signup, isAuthenticated, errors } = useAuth();
-  const navigation = useNavigate();
-
+  const { signin, isAuthenticated, errors } = useAuth();
+  const navigate = useNavigate();
+  
+  /*
   useEffect(() => {
-    if (isAuthenticated) navigation("/home"); // si ya esta logeado se redirecciona al home
+    if (isAuthenticated) navigate("/home");
   }, [isAuthenticated]);
+  */
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    signup({ username: username, password: password });
-  };
+    try {
+        await signin({username: username, password: password });
+        setError(""); // Clear any previous errors
+    } catch (error) {
+        // ... (error handling)
+    }
+};
 
   return (
     <div className="container-md d-flex justify-content-center align-items-center vh-100 ">

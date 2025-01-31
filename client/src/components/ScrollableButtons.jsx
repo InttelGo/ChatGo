@@ -1,10 +1,18 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useRoles } from "../context/ChatContext";
 
 const ScrollableButtons = () => {
   const scrollContainerRef = useRef(null);
+  const { getRoles, roles } = useRoles();
+  const [activeButton, setActiveButton] = useState(null);
   let isDown = false;
   let startX;
   let scrollLeft;
+
+  useEffect(() => {
+    getRoles();
+  }, []);
 
   const handleMouseDown = (e) => {
     isDown = true;
@@ -24,8 +32,13 @@ const ScrollableButtons = () => {
     if (!isDown) return;
     e.preventDefault();
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 2; // Multiplica para más velocidad
+    const walk = (x - startX) * 2; // Ajuste de velocidad
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleClick = (id) => {
+    setActiveButton(id);
+    console.log("Botón seleccionado:", id);
   };
 
   return (
@@ -38,10 +51,21 @@ const ScrollableButtons = () => {
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
     >
-      <button className="btn btn-warning" style={{ borderRadius: "10em" }}>Todos</button>
-      <button className="btn btn-light" style={{ borderRadius: "10em" }}>No leidos</button>
-      <button className="btn btn-light" style={{ borderRadius: "10em" }}>Administrativo</button>
-      <button className="btn btn-light" style={{ borderRadius: "10em" }}>Ventas</button>
+      {roles.length > 0 ? (
+        roles.map((role) => (
+          <button
+            key={role.id}
+            id={role.id}
+            className={`btn ${activeButton === role.id ? "btn-warning" : "btn-light"}`}
+            style={{ borderRadius: "10em" }}
+            onClick={() => handleClick(role.id)}
+          >
+            {role.name}
+          </button>
+        ))
+      ) : (
+        <p>Cargando roles...</p>
+      )}
     </div>
   );
 };
