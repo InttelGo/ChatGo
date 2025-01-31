@@ -2,7 +2,6 @@ import { Router } from "express";
 import { authRequired, rolRequired } from "../middlewares/validateToken.js";
 
 import {
-    desactiveUser,
     getProfile,
     updatedAttributes,
     register
@@ -10,9 +9,7 @@ import {
 
 const router = Router();
 
-router.post("/desactive", authRequired, rolRequired, desactiveUser);
-
-router.post("/uploaded", authRequired, rolRequired, updatedAttributes);
+router.put("/update/:id", authRequired, rolRequired, updatedAttributes);
 
 router.post("/register", authRequired, rolRequired, register);
 

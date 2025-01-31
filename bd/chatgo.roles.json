@@ -1,0 +1,40 @@
+[{
+  "_id": {
+    "$oid": "679bcfbc130e6b38e4544ca7"
+  },
+  "id": 1,
+  "descripción": "Super usuario",
+  "createdAt": {
+    "$date": "2025-01-30T19:15:08.233Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "679bcfc8130e6b38e4544ca8"
+  },
+  "id": 2,
+  "descripción": "General",
+  "createdAt": {
+    "$date": "2025-01-30T19:15:20.339Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "679bcfd7130e6b38e4544ca9"
+  },
+  "id": 3,
+  "descripción": "Administracion",
+  "createdAt": {
+    "$date": "2025-01-30T19:15:35.702Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "679bcfe1130e6b38e4544caa"
+  },
+  "id": 3,
+  "descripción": "Ventas",
+  "createdAt": {
+    "$date": "2025-01-30T19:15:45.990Z"
+  }
+}]

@@ -1,77 +1,72 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import Logo from "../assets/img/Logo.png";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
-  const [username, setUsername] = useState('');//Estado para el usuario
-  const [password, setPassword] = useState('');//Estado de contraseña para el usuario
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [seePassword, setSeePassword] = useState(false);
-  const [error, setError] = useState(""); // Estado para los mensajes de error
-  const [success, setSuccess] = useState(""); // Estado para mensajes de éxito
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const { signup, isAuthenticated, errors } = useAuth();
+  const navigation = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) navigation("/home"); // si ya esta logeado se redirecciona al home
+  }, [isAuthenticated]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(""); // Reinicia el mensaje de error
-    setSuccess(""); // Reinicia el mensaje de éxito
-
-    try {
-      const response = await fetch("https://meta.webmastercolombia.net:8443/api/login", { //Solicitud al servidor por metodo post
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setSuccess(data.message); // Mensaje de éxito desde el servidor
-        console.log("Token:", data.token); // uso de token
-        console.log("User Info:", data.user);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Error desconocido"); // Mensaje de error desde el servidor
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Error en la conexión con el servidor"); // Error de conexión
-    }
+    signup({ username: username, password: password });
   };
 
-
-
   return (
-
-    <div className="container-md">
-      <div className="container login mt-3">
-      <div className="title mt-3 mb-3">
-        <h2>¡Bienvenido!</h2>
-        <img src={Logo} alt="Logo" width="250px" />
-      </div>
-        <h4>Iniciar sesión</h4>
-        {/* Mostrar mensajes de error */}
-        {error && <div className="alert alert-danger">{error}</div>}
-        {/* Mostrar mensajes de éxito */}
-        {success && <div className="alert alert-success">{success}</div>}
+    <div className="container-md d-flex justify-content-center align-items-center vh-100 ">
+      <div
+        className="card login p-4 shadow"
+        style={{ maxWidth: "400px", width: "90%" }}
+      >
+        {/* Title container */}
+        <div className="title-container text-center mb-4">
+          <h2 className="title">¡Bienvenido!</h2>
+          <img src={Logo} alt="Logo" width="200" className="img-fluid" />
+          <h4 className="subtitle mt-3">Iniciar sesión</h4>
+        </div>
+        {/* Alerts */}
+        {errors.map((error, i) => (
+          <div key={i} className="alert alert-danger mx-3">{error}</div>
+        ))}
+        {/* Form to login */}
         <form onSubmit={handleSubmit}>
-          <div className="form-floating">
+          <div className="form-floating mb-3  mx-3">
+            {/* username Input */}
             <input
               type="text"
               className="form-control"
               id="floatingInput"
+              placeholder="Nombre usuario"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              required
             />
             <label htmlFor="floatingInput">Nombre usuario</label>
           </div>
-          <div className="form-floating mt-3">
+          <div className="form-floating mb-3  mx-3">
+            {/* password Input */}
             <input
               type={seePassword ? "text" : "password"}
               className="form-control"
               id="floatingPassword"
+              placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
-            <label htmlFor="floatingPassword">contraseña</label>
+            <label htmlFor="floatingPassword">Contraseña</label>
           </div>
-          <div className="form-check form-switch mt-3">
+          {/* check box to see the password */}
+          <div className="form-check form-switch mb-3 mx-3">
             <input
               type="checkbox"
               className="form-check-input"
@@ -79,13 +74,17 @@ function LoginPage() {
               checked={seePassword}
               onChange={() => setSeePassword(!seePassword)}
             />
-            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
+            <label
+              className="form-check-label"
+              htmlFor="flexSwitchCheckDefault"
+            >
               Ver contraseña
             </label>
           </div>
-          <div className="button-form mt-3">
+          {/* primary button login */}
+          <div className="d-grid mx-3">
             <button className="btn btn-primary" type="submit">
-              Iniciar sesión
+              <h4>Iniciar sesión</h4>
             </button>
           </div>
         </form>

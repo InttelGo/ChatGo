@@ -38,21 +38,33 @@ export const sendMessage = async (req, res) => {
 export const getConversation = async (req, res) => {
   const { number, description, foto, message } = req.body;
   try {
-    // Find the client by their number
+    // Encontrar el cliente por numero
     const client = await Client.findOne({ number: number });
   
     // Delegate logic based on whether the client exists
     const newMessage = await existingClient(client, message);
     if (!newMessage) return await newClient(number, description, foto, message, res);
     
-  
-    return res.json(newMessage); // Assuming you want to return the conversation
+    return res.json(newMessage); 
   } catch (error) {
     res.status(500).json({ message: 'Error al enviar el mensaje' });
     return null;
   }
 };
 
+
+export const getAllConversation = async (req, res) => {
+  const  id = req.params.id;
+  try {
+    const conversations = await Conversation.findById(id);
+    if (!conversations) return res.status(404).json({ message: 'No hay conversaciones' });
+
+    res.json(conversations);  // devuelvo la conversacion completa
+  } catch (error){
+    res.status(500).json({ message: 'Error al obtener las conversaciones' });
+    return null;
+  }
+};
 async function existingClient(client, message) {
   // funcion para cuando existe el cliente
   if (!client) return null;

@@ -9,10 +9,13 @@ import rolRoutes from "./routes/role.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import redirectRoutes from "./routes/redirecction.routes.js";
 import { VERIFY_TOKEN } from "./config.js";
+import cors from "cors";
 
 const app = express();
 
+
 // Middlewares
+app.use(cors());
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(express.json());
