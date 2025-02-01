@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "./components/ErrorBoundary";
-import LoginPage from "./pages/LoginPage";
+import LoginPage from "./ui/pages/LoginPage";
 import ProtectedRoutes from "./ProtectedRoutes";
 import AuthProvider from "./context/AuthContext";
 import { RolesProvider } from "./context/ChatContext";
-import HomePage from "./pages/HomePAge";
+import HomePage from "./ui/pages/HomePAge";
 
 function App() {
   return (

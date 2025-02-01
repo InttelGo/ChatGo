@@ -18,6 +18,7 @@ const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
   const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [loading, setLoading] = useState(true);
 
   const signin = async (user) => {
     try {
@@ -43,24 +44,37 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     //Manejo de cookies para el front
     async function checkLogin() {
-      if (cookies.token) {
-        try {
-          const res = await verifyToken(cookies.token);
-          if (!res.data) setErrors(false);
-
-          setUser(res.data);
-          setIsAuthenticated(true);
-        } catch (error) {
-          setIsAuthenticated(false);
-          setUser(null);
-        }
+      if (!cookies.token) {
+        setIsAuthenticated(false);
+          setLoading(false);
+          return;
       }
+
+      try {
+        const res = await verifyToken(cookies);
+        if (!res.data) {
+          setIsAuthenticated(false);
+          setLoading(false);
+          return;
+        }
+
+        console.log(res);
+        setUser(res.data);
+        setIsAuthenticated(true);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsAuthenticated(false);
+        setUser(null);
+        setLoading(false);
+      }
+      
     }
     checkLogin();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ signin, user, isAuthenticated, errors }}>
+    <AuthContext.Provider value={{ signin, user, isAuthenticated, errors, loading }}>
       {children}
     </AuthContext.Provider>
   );

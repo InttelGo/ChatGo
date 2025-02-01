@@ -3,17 +3,17 @@ import https from 'https';
 import fs from 'fs';
 import { connectDB } from './db.js';
 
-// Cargar certificado SSL
-const sslOptions = {
-    cert: fs.readFileSync('/var/www/chatgo/src/certificado.crt'), // Asegúrate de usar rutas absolutas correctas
-    key: fs.readFileSync('/var/www/chatgo/src/private.key') // Clave privada del certificado
-};
+const httpsOptions = {
+    key: fs.readFileSync("/var/www/chatgo/src/private.key"),  // Clave privada
+    cert: fs.readFileSync("/var/www/chatgo/src/certificado.crt"), // Certificado principal
+    ca: fs.readFileSync("/var/www/chatgo/src/certificado-ca.crt"), // Certificado CA si es necesario
+  };
 
 // Conectar a la base de datos
 connectDB();
 
 // Inicializar servidor HTTPS
 const PORT = 8443;
-https.createServer(sslOptions, app).listen(PORT, () => {
+https.createServer(httpsOptions, app).listen(PORT, () => {
     console.log(`Servidor HTTPS corriendo en el puerto ${PORT}`);
 });

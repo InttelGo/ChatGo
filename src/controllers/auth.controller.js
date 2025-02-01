@@ -3,7 +3,7 @@ import Role from "../models/Role.model.js";
 import bcrypt from "bcryptjs";
 import { createWebToken } from "../libs/jws.js";
 import jwt from "jsonwebtoken";
-import { VERIFY_TOKEN } from "../config.js";
+import { TOKEN_SECRET } from "../config.js";
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
@@ -33,7 +33,7 @@ export const login = async (req, res) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: true,
       path: "/",
     });
 
@@ -55,10 +55,12 @@ export const logout = async (req, res) => {
 };
 
 export const verifyToken = async (req, res) => {
-  const token = req.cookies.token;
+  const token = req.body.token;
+  
+  console.error(token);
   if (!token) return res.status(401).json(["No token provided"]);
 
-  jwt.verify(token, VERIFY_TOKEN, async (error, user) => {
+  jwt.verify(token, TOKEN_SECRET, async (error, user) => {
     if (error) return res.status(403).json(["Invalid token"]);
 
     const userfound = await User.findById(user.id);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import Logo from "../assets/img/Logo.png";
+import { useAuth } from "../../context/AuthContext";
+import Logo from "../../assets/img/Logo.png";
 import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
@@ -10,11 +10,10 @@ function LoginPage() {
   const { signin, isAuthenticated, errors } = useAuth();
   const navigate = useNavigate();
   
-  /*
   useEffect(() => {
     if (isAuthenticated) navigate("/home");
   }, [isAuthenticated]);
-  */
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();

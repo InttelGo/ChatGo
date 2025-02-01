@@ -7,7 +7,7 @@ import { loginSchema } from "../schemas/auth.schema.js";
 
 const router = Router();
 router.post("/login", validateSchema(loginSchema), login);
-router.get("/auth/verifyToken", verifyToken);
+router.post("/auth/verifyToken", verifyToken);
 router.post("/logout", logout);
 
 export default router;
