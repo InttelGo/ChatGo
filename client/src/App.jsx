@@ -3,24 +3,35 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import LoginPage from "./ui/pages/LoginPage";
 import ProtectedRoutes from "./ProtectedRoutes";
 import AuthProvider from "./context/AuthContext";
-import { RolesProvider } from "./context/ChatContext";
+import RolesProvider from "./context/RoleContext";
+import UsersProvider from "./context/UsersContext";
+import ChatsProvider from "./context/ChatsContext";
 import HomePage from "./ui/pages/HomePAge";
 
 function App() {
   return (
     <AuthProvider>
-      <RolesProvider>
+      <UsersProvider>
         <BrowserRouter>
           <ErrorBoundary>
             <Routes>
               <Route path="/" element={<LoginPage />} /> {/* Home page */}
-              <Route element={<ProtectedRoutes/>}>
-                <Route path="/home" element={<HomePage />} />
+              <Route element={<ProtectedRoutes />}>
+                <Route
+                  path="/home"
+                  element={
+                    <ChatsProvider>
+                      <RolesProvider>
+                        <HomePage />
+                      </RolesProvider>
+                    </ChatsProvider>
+                  }
+                />
               </Route>
             </Routes>
           </ErrorBoundary>
         </BrowserRouter>
-      </RolesProvider>
+      </UsersProvider>
     </AuthProvider>
   );
 }

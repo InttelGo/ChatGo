@@ -1,7 +1,6 @@
 import React from "react";
 import { PrimaryButtonOutline } from "../../components/Buttons";
 import Chat from "../Chat";
-
 const HomePage = () => {
   return (
     <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
@@ -21,7 +20,6 @@ const HomePage = () => {
             <PrimaryButtonOutline icon="forum" size={"2em"} />
             <PrimaryButtonOutline icon="account_circle" size={"2.5em"} />
           </div>
-
           {/* Contenido Principal */}
           <div className="flex-grow-1 d-flex">
             <Chat/>

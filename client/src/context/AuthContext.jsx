@@ -17,14 +17,13 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [cookies, setCookie, removeCookie] = useCookies(["token"]);
+  const [cookies] = useCookies(["token"]);
   const [loading, setLoading] = useState(true);
 
   const signin = async (user) => {
     try {
       const res = await loginRequest(user);
       setUser(res.data);
-      console.log(res.data);
       setIsAuthenticated(true);
       setCookie("token", res.data.token, { path: "/" });
     } catch (error) {
@@ -58,7 +57,6 @@ const AuthProvider = ({ children }) => {
           return;
         }
 
-        console.log(res);
         setUser(res.data);
         setIsAuthenticated(true);
         setLoading(false);

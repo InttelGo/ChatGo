@@ -1,18 +1,27 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useRoles } from "../context/ChatContext";
+import { useRoles } from "../context/RoleContext";
+import { useChats } from "../context/ChatsContext";
 
 const ScrollableButtons = () => {
   const scrollContainerRef = useRef(null);
   const { getRoles, roles } = useRoles();
+  const { getChats } = useChats();
   const [activeButton, setActiveButton] = useState(null);
+  const [isSeeGroup, setIsSeeGroup] = useState(0);
   let isDown = false;
   let startX;
   let scrollLeft;
 
   useEffect(() => {
     getRoles();
-  }, []);
+  }, []); // Agregar getRoles como dependencia
+
+  useEffect(() => {
+    if (roles.length > 0 && !activeButton) {
+      setActiveButton(roles[0]._id);
+      getChats(roles[0]._id, isSeeGroup);
+    }
+  }, [roles]);
 
   const handleMouseDown = (e) => {
     isDown = true;
@@ -37,35 +46,70 @@ const ScrollableButtons = () => {
   };
 
   const handleClick = (id) => {
-    setActiveButton(id);
-    console.log("Botón seleccionado:", id);
+      setActiveButton(id);
+      getChats(id, isSeeGroup);
+  };
+
+  const handleSeeGroup = (num) => {
+    setIsSeeGroup(isSeeGroup == num ? 0 : num);
+    if (activeButton) {
+      getChats(activeButton, isSeeGroup == num ? 0 : num);
+    }
   };
 
   return (
-    <div
-      ref={scrollContainerRef}
-      className="scroll-container d-flex overflow-hidden gap-2 p-2"
-      style={{ whiteSpace: "nowrap", cursor: "grab", userSelect: "none" }}
-      onMouseDown={handleMouseDown}
-      onMouseLeave={handleMouseLeave}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-    >
-      {roles.length > 0 ? (
-        roles.map((role) => (
-          <button
-            key={role.id}
-            id={role.id}
-            className={`btn ${activeButton === role.id ? "btn-warning" : "btn-light"}`}
-            style={{ borderRadius: "10em" }}
-            onClick={() => handleClick(role.id)}
-          >
-            {role.name}
-          </button>
-        ))
-      ) : (
-        <p>Cargando roles...</p>
-      )}
+    <div className="my-3">
+      <div
+        ref={scrollContainerRef}
+        className="scroll-container d-flex overflow-hidden gap-2 p-2"
+        style={{ whiteSpace: "nowrap", cursor: "grab", userSelect: "none" }}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+      >
+        {roles.length > 0 ? (
+          roles.map(
+            (
+              role // Aquí cambiamos forEach por map
+            ) => (
+              <button
+                key={role._id}
+                id={role._id}
+                className={`btn ${
+                  activeButton === role._id ? "btn-warning" : "btn-light"
+                }`}
+                style={{ borderRadius: "10em" }}
+                onClick={() => handleClick(role._id)}
+              >
+                {role.descripcion}{" "}
+                {/* Usamos "descripción" en lugar de "name" */}
+              </button>
+            )
+          )
+        ) : (
+          <p>Cargando roles...</p>
+        )}
+      </div>
+      <div
+        className="scroll-container d-flex overflow-hidden gap-2 p-2"
+        style={{ whiteSpace: "nowrap", cursor: "grab", userSelect: "none" }}
+      >
+        <button
+          className={`btn ${isSeeGroup == 1 ? "btn-warning" : "btn-light"}`}
+          style={{ borderRadius: "10em" }}
+          onClick={() => handleSeeGroup(1)}
+        >
+          Leidos{" "}
+        </button>
+        <button
+          className={`btn ${isSeeGroup == 2 ? "btn-warning" : "btn-light"}`}
+          style={{ borderRadius: "10em" }}
+          onClick={() => handleSeeGroup(2)}
+        >
+          No leidos{" "}
+        </button>
+      </div>
     </div>
   );
 };

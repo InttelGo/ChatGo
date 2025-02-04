@@ -1,16 +1,15 @@
 import { Router } from "express";
-import { authRequired } from "../middlewares/validateToken.js";
+
+import { authRequired, rolRequired } from "../middlewares/validateToken.js";
 
 import {
-  sendMessage,
   getAllConversation,
-  getConversation,
+  updateConversation,
 } from "../controllers/conversation.controller.js";
 
 const router = Router();
 
-router.post("/send", authRequired, sendMessage);
-router.post("/new/client", getConversation);
-router.get("/:id", getAllConversation);
+router.post("/", getAllConversation);
+router.put("/update",authRequired, updateConversation);
 
 export default router;

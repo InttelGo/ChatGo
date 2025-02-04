@@ -1,5 +1,7 @@
 import express from "express";
+import { newMessage } from "../controllers/conversation.controller.js";
 const router = express.Router();
+router.post('/', newMessage);
 
 router.get("/", (req, res) => {
   const mode = req.query["hub.mode"];

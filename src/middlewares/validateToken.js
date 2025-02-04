@@ -2,7 +2,9 @@ import jws from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
 
 export const authRequired = (req, res, next) => {
-  const { token } = req.cookies;
+  console.log(req.body);
+  const { token } = req.body;
+  console.log(token);
   if (!token) return res.status(401).json(["No token provided"]);
   jws.verify(token, TOKEN_SECRET, (err, decode) => {
     if (err) return res.status(403).json(["Invalid token"]);

@@ -39,11 +39,11 @@ export const updatedAttributes = async (req, res) => {
         .status(400)
         .json({ message: "Todos los campos son obligatorios" });
 
-    let role ="";
-    if(!roleId){
-        role = req.user.id ;
-    }else {
-        role = roleId;
+    let role = "";
+    if (!roleId) {
+      role = req.user.id;
+    } else {
+      role = roleId;
     }
     //Encriptar la contraseña
     const passwordHash = await bcrypt.hash(password, 10);
@@ -59,29 +59,80 @@ export const updatedAttributes = async (req, res) => {
   } catch (error) {}
 };
 
-export const getProfile = async (req, res) =>{
-    try {
-        const user = await User.findById(req.params.id);
-        if(!user) return res.status(404).json({message: "Usuario no encontrado"});
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({message: "Error inesperado"});
-    }
-}
+export const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error inesperado" });
+  }
+};
 
-export const desactiveUser = async (req, res) =>{
-    try {
-        const user = await User.findById(req.params.id);
-        if(!user) return res.status(404).json({message: "Usuario no encontrado"});
+export const desactiveUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
 
-        user.state = false;
+    user.state = false;
 
-        const updatedUser = await user.save();
-        if(!updatedUser)
-            return res.status(400).json({message: "Error al desactivar el usuario"});
+    const updatedUser = await user.save();
+    if (!updatedUser)
+      return res
+        .status(400)
+        .json({ message: "Error al desactivar el usuario" });
 
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({message: "Error inesperado"});
-    }
-}
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error inesperado" });
+  }
+};
+
+export const getUsers = async (req, res) => {
+  try {
+    const usersByRole = await User.aggregate([
+      {
+        $lookup: {
+          from: "roles",
+          localField: "role",
+          foreignField: "_id",
+          as: "roleInfo",
+        },
+      },
+      {
+        $unwind: "$roleInfo", 
+      },
+      {
+        $group: {
+          _id: {
+            roleId: "$roleInfo._id",
+            descripcion: "$roleInfo.descripcion", 
+          },
+          users: {
+            $push: {
+              _id: "$_id",
+              name: "$name",
+              createdAt: "$createdAt",
+              updatedAt: "$updatedAt",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          role: "$_id.roleId",
+          descripcion: "$_id.descripcion",
+          users: 1,
+        },
+      },
+    ]);
+    console.log(usersByRole);
+    res.json(usersByRole);
+  } catch (error) {
+    console.error("Error getting users by role:", error);
+    res.status(500).json({ message: "Error getting users by role" });
+  }
+};

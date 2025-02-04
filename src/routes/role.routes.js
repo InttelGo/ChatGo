@@ -10,6 +10,6 @@ const router = Router();
 
 router.post("/add/role", authRequired, rolRequired, createRole);
 
-router.get("/role", authRequired, getAllRoles)
+router.post("/role", authRequired, getAllRoles)
 
 export default router;

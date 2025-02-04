@@ -2,26 +2,29 @@ import mongoose from "mongoose";
 
 const MessageSchema = new mongoose.Schema(
   {
-    conversationId: {
+    wmid: {
+      type:String,
+      required: true,
+      unique: true,
+    },
+    from: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Conversation",
       required: true,
     },
-    sender: {
-      type: mongoose.Schema.Types.ObjectId,
-      refPath: "senderType", //Esta es la posible llave que puede tener a la hora de crear el mensaje
-      required: true,
-    },
-    senderType: {
+    fromType: {  
       type: String,
-      enum: ["User", "Client"], // Define los podibles tipos de mensajeros
+      enum: ['clients', 'users'], 
+      required: true, 
+    },
+    message: {
+      type: String,
       required: true,
     },
-    content: { type: String, required: true },
+    type: { type: String, required: true },
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model("mesagge", MessageSchema);
+export default mongoose.model("message", MessageSchema);
