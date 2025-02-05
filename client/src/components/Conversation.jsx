@@ -2,8 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { useChats } from "../context/ChatsContext";
 import { useAuth } from "../context/AuthContext";
 import { useUsers } from "../context/UsersContext";
-import { PrimaryButtonOutline, PrimaryButton } from "../components/Buttons";
-import UserModal from "../components/UserModal";
+import { PrimaryButtonOutline, PrimaryButton } from "./Buttons";
+import UserModal from "./UserModal";
 import Logo from "../assets/img/Logo.png";
 
 function Conversation() {
