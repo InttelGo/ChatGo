@@ -22,6 +22,16 @@ function Conversation() {
     image: null,
   });
 
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const handlePersonClick = (user, area) => {
     setSelectedUser({ user: user, area: area });
     setTextValue("");
@@ -64,9 +74,7 @@ function Conversation() {
     setIsFileInputVisible(!isFileInputVisible);
   };
 
-  const sendMessage = () => {
-
-  }
+  const sendMessage = () => {};
 
   const handleFileUpload = (event, type) => {
     const file = event.target.files[0];
@@ -177,34 +185,34 @@ function Conversation() {
             {/* Messages */}
             <div className="d-flex flex-column">
               {/* Messages */}
-              <div className="d-flex flex-column">
-                {messages.length > 0 ? (
-                  messages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`p-3 rounded mb-2 ${
-                        message.fromType != "clients"
-                          ? "align-self-end bg-warning text-white p-3 rounded mb-2"
-                          : "align-self-start bg-light p-3 rounded mb-2"
-                      }`}
-                      style={{ maxWidth: "60%" }}
+              {messages.length > 0 ? (
+                messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded mb-2 ${
+                      message.fromType !== "clients"
+                        ? "align-self-end bg-warning text-white"
+                        : "align-self-start bg-light"
+                    }`}
+                    style={{ maxWidth: "60%" }}
+                  >
+                    <p className="mb-1">{message.message}</p>
+                    <small
+                      className={
+                        message.fromType !== "clients"
+                          ? "text-white"
+                          : "text-muted"
+                      }
                     >
-                      <p className="mb-1">{message.message}</p>
-                      <small
-                        className={
-                          message.fromType != "clients"
-                            ? "text-white "
-                            : "text-muted "
-                        }
-                      >
-                        {new Date(message.createdAt).toLocaleTimeString()}
-                      </small>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center text-muted">No hay mensajes</p>
-                )}
-              </div>
+                      {new Date(message.createdAt).toLocaleTimeString()}
+                    </small>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-mu ted">No hay mensajes</p>
+              )}
+              {/* Elemento invisible para hacer scroll al final */}
+              <div ref={messagesEndRef} />
             </div>
           </div>
           {/* Input Section */}
@@ -329,11 +337,7 @@ function Conversation() {
               value={messageSend} // El valor del input es controlado por el estado
               onChange={handleMessageUpload} // Capturamos el valor con cada tecla presionada
             />
-            <PrimaryButton
-              icon={"send"}
-              onClick={sendMessage}
-              size={"2em"}
-            />
+            <PrimaryButton icon={"send"} onClick={sendMessage} size={"2em"} />
           </div>
         </div>
       ) : (
@@ -375,5 +379,4 @@ function Conversation() {
     </>
   );
 }
-
 export default Conversation;

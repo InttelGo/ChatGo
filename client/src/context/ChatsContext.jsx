@@ -57,11 +57,11 @@ const ChatsProvider = ({ children }) => {
 
   const getMessages = async (selectedChat) => {
     try {
-      console.log(selectedChat);
       const res = await messagesRequest({
         token: cookies.token,
         chat: selectedChat,
       });
+      console.log(res);
       setMessages(res.data);
     } catch (error) {
       console.error("Error in getMessages:", error.message); // Use console.error for errors
@@ -69,10 +69,17 @@ const ChatsProvider = ({ children }) => {
     }
   };
 
-  const setAllMessages = async (idChat, newMessage) => {
-    console.log(newMessage);
-  }
-
+  const addNewMessageInChat = (newMessage) => {
+    try {
+      console.log(messages)
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      console.log(messages)
+    } catch (error) {
+      console.error("Error in addNewMessageInChat:", error.message);
+      setErrors(error.response?.data || error.message);
+    }
+  };
+  
   const redirectChat = async (chat, redirect) => {
     try {
       const res = await chatRedirectUpdate({
@@ -88,33 +95,40 @@ const ChatsProvider = ({ children }) => {
   };
 
   const setMessageInConversation = async (idChat, newMessage) => {
+    try {
+      setChats((prevChats) => {
+        // Verificar si prevChats es un array, si no, asignar un array vacío
+        const updatedChats = Array.isArray(prevChats) ? [...prevChats] : [];
 
-  };
-
-  const newChat = (newConversations) => {
-    // Convertir en array si es un solo objeto
-    const conversationsArray = Array.isArray(newConversations)
-      ? newConversations
-      : [newConversations];
-
-    setChats((prevChats) => {
-      let updatedChats = [...prevChats];
-
-      conversationsArray.forEach((newChat) => {
-        // Buscar índice del chat en la lista
-        const index = updatedChats.findIndex( 
-          (chat) => chat._id === newChat._id
-        );
+        // Encontrar el índice del chat en la lista
+        const index = updatedChats.findIndex((chat) => chat._id === idChat);
 
         if (index !== -1) {
-          // Eliminar chat existente
+          // Extraer el chat, actualizarlo y moverlo al principio
+          let chatToUpdate = { ...updatedChats[index] };
+
+          // Actualizar las propiedades necesarias
+          chatToUpdate.read = false;
+          chatToUpdate.lastMessage = newMessage;
+
+          // Eliminar el chat de su posición actual y colocarlo al inicio
           updatedChats.splice(index, 1);
+          updatedChats.unshift(chatToUpdate);
         }
 
-        // Agregar siempre el chat al inicio
-        updatedChats.unshift(newChat);
+        return updatedChats;
       });
+    } catch (error) {
+      console.error("Error in setMessageInConversation:", error.message);
+      setErrors(error.response?.data || error.message);
+    }
+  };
 
+  const newChat = (newChat) => {
+    setChats((prevChats) => {
+      let updatedChats = [...prevChats];
+      // Agregar siempre el chat al inicio
+      updatedChats.unshift(newChat);
       return updatedChats;
     });
   };
@@ -130,7 +144,7 @@ const ChatsProvider = ({ children }) => {
         setMessageInConversation,
         selectChat,
         messages,
-        setAllMessages,
+        addNewMessageInChat,
         getMessages,
         redirectChat,
         newChat,
