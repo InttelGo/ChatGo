@@ -47,7 +47,6 @@ function ChatsList() {
     });
 
     getMessages(selectedChat);
-    chats;
   };
   const formatPhoneNumber = (number) => {
     if (!number) return "";

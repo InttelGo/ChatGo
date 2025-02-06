@@ -119,6 +119,7 @@ export const newMessage = async (req, res) => {
           wmid: savedMessage.wmid,
         },
       };
+      console.log(newMessageData);
       io.emit("mensaje_nuevo", newMessageData);
       res.status(200).json(newMessageData);
     }
