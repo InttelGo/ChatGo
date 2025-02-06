@@ -12,29 +12,29 @@ import HomePage from "./ui/pages/HomePAge";
 function App() {
   return (
     <AuthProvider>
-      <UsersProvider>
+      <ChatsProvider>
         <SocketProvider>
-          <BrowserRouter>
-            <ErrorBoundary>
-              <Routes>
-                <Route path="/" element={<LoginPage />} />
-                <Route element={<ProtectedRoutes />}>
-                  <Route
-                    path="/home"
-                    element={
-                      <ChatsProvider>
+          <UsersProvider>
+            <BrowserRouter>
+              <ErrorBoundary>
+                <Routes>
+                  <Route path="/" element={<LoginPage />} />
+                  <Route element={<ProtectedRoutes />}>
+                    <Route
+                      path="/home"
+                      element={
                         <RolesProvider>
                           <HomePage />
                         </RolesProvider>
-                      </ChatsProvider>
-                    }
-                  />
-                </Route>
-              </Routes>
-            </ErrorBoundary>
-          </BrowserRouter>
+                      }
+                    />
+                  </Route>
+                </Routes>
+              </ErrorBoundary>
+            </BrowserRouter>
+          </UsersProvider>
         </SocketProvider>
-      </UsersProvider>
+      </ChatsProvider>
     </AuthProvider>
   );
 }

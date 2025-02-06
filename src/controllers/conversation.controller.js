@@ -2,23 +2,22 @@ import Role from "../models/Role.model.js";
 import Conversation from "../models/Conversation.model.js";
 import Client from "../models/Client.model.js";
 import Message from "../models/message.model.js";
+import { getIO } from "../io.js";
 
 export const newMessage = async (req, res) => {
-  const { contacts, messages, changes } = req.body.entry[0].changes[0].value; //Mensajes y el usuario traido a traves del webhook
-  if(changes)
-    console.log(changes)
-  console.log(req.body.entry[0].changes[0])
-  if(!contacts)
+  const { contacts, messages, changes } = req.body.entry[0].changes[0].value;
+  if (changes) console.log(changes);
+  console.log(req.body.entry[0].changes[0]);
+  if (!contacts)
     return res.status(401).json(["No hay contactos en el mensaje"]);
 
-  const clientNumber = contacts[0].wa_id; //Numero telefonico del usuario
-  const clientName = contacts[0].profile.name; //Nombre del usuario
-  if(! messages[0].text.body)
+  const clientNumber = contacts[0].wa_id;
+  const clientName = contacts[0].profile.name;
+  if (!messages[0].text.body)
     return res.status(401).json(["No hay contenido en el mensaje"]);
 
-  // Check if the message is a new one
-  const messageContent = messages[0].text.body; //contenido del mensage
-  const messageType = messages[0].type; //tipo de mensage
+  const messageContent = messages[0].text.body;
+  const messageType = messages[0].type;
   const idMessage = messages[0].id;
 
   try {
@@ -29,7 +28,6 @@ export const newMessage = async (req, res) => {
         number: clientNumber,
         name: clientName,
       });
-
       client = await client.save();
       if (!client) return res.status(401).json(["Error al crear el cliente"]);
     }
@@ -38,24 +36,24 @@ export const newMessage = async (req, res) => {
     if (!findRole) return res.status(401).json(["Error al encontrar el role"]);
 
     let conversation = await Conversation.findOne({ client: client._id });
+    let isNewConversation = false;
 
     if (!conversation) {
+      isNewConversation = true;
       conversation = new Conversation({
         role: findRole._id,
         client: client._id,
         read: false,
       });
-
       conversation = await conversation.save();
       if (!conversation)
         return res.status(401).json(["Error al guardar la conversacion"]);
     }
 
-    // Check if a message with this waMessageId already exists
     let message = await Message.findOne({ wmid: idMessage });
 
     if (message) {
-      return res.status(200).json([client.name + " está viendo el chat"]); // Correct status code
+      return res.status(200).json([client.name + " está viendo el chat"]);
     }
 
     message = new Message({
@@ -66,18 +64,64 @@ export const newMessage = async (req, res) => {
       type: messageType,
     });
 
-    const savedMessage = await message.save(); // Save the message
-
+    const savedMessage = await message.save();
     if (!savedMessage) {
       return res.status(401).json(["Error al guardar el mensaje"]);
     }
 
-    // Update the Conversation's messages array (correctly)
     await Conversation.findByIdAndUpdate(conversation._id, {
       $push: { messages: savedMessage._id },
     });
 
-    res.status(201).json(["Conversacion creada con exito..."]);
+    const populatedConversation = await Conversation.findById(conversation._id).populate({
+      path: "messages",
+      options: { sort: { createdAt: -1 }, limit: 1 },
+    });
+
+    const lastMessage =
+      populatedConversation.messages.length > 0
+        ? populatedConversation.messages[0]
+        : null;
+
+    const io = getIO();
+    
+    if (isNewConversation) {
+      const formattedConversation = {
+        _id: conversation._id,
+        role: conversation.role,
+        client: {
+          number: client.number,
+          name: client.name,
+        },
+        participants: conversation.participants,
+        read: conversation.read,
+        lastMessage: lastMessage
+          ? {
+              from: lastMessage.from,
+              message: lastMessage.message,
+              type: lastMessage.type,
+              createdAt: lastMessage.createdAt,
+              updatedAt: lastMessage.updatedAt,
+              wmid: lastMessage.wmid,
+            }
+          : null,
+      };
+      io.emit("nueva_conversacion", formattedConversation);
+      res.status(201).json(formattedConversation);
+    } else {
+      const newMessageData = {
+        conversationId: conversation._id,
+        newMessage: {
+          from: savedMessage.from,
+          message: savedMessage.message,
+          type: savedMessage.type,
+          createdAt: savedMessage.createdAt,
+          wmid: savedMessage.wmid,
+        },
+      };
+      io.emit("mensaje_nuevo", newMessageData);
+      res.status(200).json(newMessageData);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al enviar el mensaje" });
@@ -88,14 +132,24 @@ export const getAllConversation = async (req, res) => {
   const { role, state } = req.body;
   try {
     let conversations = null;
-    let state2 = false;
 
-    state2 = state == 1 ? true : false;
+    if(state == 2){
+      conversations = await Conversation.find({
+        role: role,
+        read: false,
+      });
+    }else if(state == 1){
+      conversations = await Conversation.find({
+        role: role,
+        read: true,
+      });
+    }else{
+      conversations = await Conversation.find({
+        role: role,
+      });
+    }
 
-    conversations = await Conversation.find({
-      role: role,
-      read: state2,
-    });
+    
 
     if (!conversations || conversations.length === 0) {
       return res.status(201).json({ message: "No hay conversaciones" });
@@ -171,10 +225,10 @@ export const updateConversation = async (req, res) => {
   try {
     const updatedConversation = await Conversation.findByIdAndUpdate(
       conversation._id,
-      { 
-        read : conversation.read,
-        participants : conversation.participants,
-        updatedAt : new Date()
+      {
+        read: conversation.read,
+        participants: conversation.participants,
+        updatedAt: new Date(),
       },
       { new: true }
     );

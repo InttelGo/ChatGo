@@ -1,5 +1,10 @@
-import React, { createContext, useState, useContext } from "react";
-import { chatRequest, chatRequestUpdate, messagesRequest, chatRedirectUpdate } from "../api/chats.js";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import {
+  chatRequest,
+  chatRequestUpdate,
+  messagesRequest,
+  chatRedirectUpdate,
+} from "../api/chats.js";
 import { useCookies } from "react-cookie";
 
 const ChatContext = createContext();
@@ -52,6 +57,7 @@ const ChatsProvider = ({ children }) => {
 
   const getMessages = async (selectedChat) => {
     try {
+      console.log(selectedChat);
       const res = await messagesRequest({
         token: cookies.token,
         chat: selectedChat,
@@ -63,23 +69,72 @@ const ChatsProvider = ({ children }) => {
     }
   };
 
-  const redirectChat = async (chat, redirect) =>{
+  const setAllMessages = async (idChat, newMessage) => {
+    console.log(newMessage);
+  }
+
+  const redirectChat = async (chat, redirect) => {
     try {
       const res = await chatRedirectUpdate({
         token: cookies.token,
         conversation: chat,
-        redirections: redirect
+        redirections: redirect,
       });
       console.log(res.data);
     } catch (error) {
       console.error("Error in redirectChat:", error.message); // Use console.error for errors
       setErrors(error.response?.data || error.message); // Improved error handling
     }
-  }
+  };
+
+  const setMessageInConversation = async (idChat, newMessage) => {
+
+  };
+
+  const newChat = (newConversations) => {
+    // Convertir en array si es un solo objeto
+    const conversationsArray = Array.isArray(newConversations)
+      ? newConversations
+      : [newConversations];
+
+    setChats((prevChats) => {
+      let updatedChats = [...prevChats];
+
+      conversationsArray.forEach((newChat) => {
+        // Buscar índice del chat en la lista
+        const index = updatedChats.findIndex( 
+          (chat) => chat._id === newChat._id
+        );
+
+        if (index !== -1) {
+          // Eliminar chat existente
+          updatedChats.splice(index, 1);
+        }
+
+        // Agregar siempre el chat al inicio
+        updatedChats.unshift(newChat);
+      });
+
+      return updatedChats;
+    });
+  };
 
   return (
     <ChatContext.Provider
-      value={{ getChats, chats, chat, errors, updateConversation, selectChat, messages, getMessages, redirectChat }}
+      value={{
+        getChats,
+        chats,
+        chat,
+        errors,
+        updateConversation,
+        setMessageInConversation,
+        selectChat,
+        messages,
+        setAllMessages,
+        getMessages,
+        redirectChat,
+        newChat,
+      }}
     >
       {children}
     </ChatContext.Provider>

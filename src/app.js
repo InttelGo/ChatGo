@@ -26,10 +26,7 @@ app.use(
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(express.json());
-// Cookie parser middleware
 app.use(CookieParser());
-
-//RUTAS
 
 //webhook
 app.use("/webhook", webhookRoutes);

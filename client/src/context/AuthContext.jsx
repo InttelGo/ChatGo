@@ -17,17 +17,19 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [cookies] = useCookies(["token"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["token"]); // Use access_token to be consistent
   const [loading, setLoading] = useState(true);
 
   const signin = async (user) => {
     try {
       const res = await loginRequest(user);
-      setUser(res.data);
-      setIsAuthenticated(true);
-      setCookie("token", res.data.token, { path: "/" });
+        setUser(res.data.user); 
+        setIsAuthenticated(true);
+        setCookie("token", res.data.token, { path: "/" }); // Set cookie
+
     } catch (error) {
-      setErrors(error.response.data);
+      console.error("Login error:", error);
+      setErrors(["An error occurred during login."]);
     }
   };
 
@@ -41,33 +43,31 @@ const AuthProvider = ({ children }) => {
   }, [errors]);
 
   useEffect(() => {
-    //Manejo de cookies para el front
     async function checkLogin() {
-      if (!cookies.token) {
+      if (!cookies.token) { // Use access_token to be consistent
         setIsAuthenticated(false);
-          setLoading(false);
-          return;
+        setLoading(false);
+        return;
       }
 
       try {
-        const res = await verifyToken(cookies);
-        if (!res.data) {
+        const res = await verifyToken(cookies); // No need to pass cookies if verifyToken reads from them
+        if (res.status === 200 && res.data) { // Check for successful response and data
+          setUser(res.data);
+          setIsAuthenticated(true);
+        } else {
+          removeCookie("access_token"); // Remove invalid cookie
           setIsAuthenticated(false);
-          setLoading(false);
-          return;
         }
-
-        setUser(res.data);
-        setIsAuthenticated(true);
-        setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error("Token verification error:", error);
+        removeCookie("access_token"); // Remove cookie on error
         setIsAuthenticated(false);
-        setUser(null);
-        setLoading(false);
+      } finally {
+        setLoading(false); // Set loading to false regardless of outcome
       }
-      
     }
+
     checkLogin();
   }, []);
 
