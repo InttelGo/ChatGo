@@ -4,6 +4,7 @@ import Client from "../models/Client.model.js";
 import Message from "../models/message.model.js";
 import { getIO } from "../io.js";
 
+
 export const newMessage = async (req, res) => {
   const { contacts, messages, changes } = req.body.entry[0].changes[0].value;
   if (changes) console.log(changes);
