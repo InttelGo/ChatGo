@@ -9,7 +9,7 @@ router.get("/", (req, res) => {
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  if (mode === "subscribe" && token === "chatgoAPI") {
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
     res.status(200).send(challenge);
     console.log("Webhook verified successfully!");
   } else {

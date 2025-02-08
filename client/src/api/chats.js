@@ -1,4 +1,5 @@
 import axios from "./axios";
+import axiosMeta from "./axiosMeta";
 
 export const chatRequest = (chat) =>
     axios.post(`/conversation/`, chat);
@@ -9,3 +10,5 @@ export const chatRequestUpdate = (chat) =>
 export const messagesRequest = (chat) => axios.post(`/conversation/message/`, chat);
 
 export const chatRedirectUpdate = (chat) => axios.put(`/conversation/redirect/`, chat);
+
+export const sendMessageRequest = (data) => axiosMeta.post("", data);

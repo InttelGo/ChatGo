@@ -6,6 +6,7 @@ import Redirection from "../models/Redirection.model.js";
 import User from "../models/User.model.js";
 import { getIO } from "../io.js";
 
+
 export const newMessage = async (req, res) => {
   try {
     const { contacts, messages, changes } = req.body.entry[0].changes[0].value;
