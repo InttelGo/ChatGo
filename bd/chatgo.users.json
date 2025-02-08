@@ -51,4 +51,76 @@
   "updatedAt": {
     "$date": "2025-01-30T21:00:40.043Z"
   }
+},
+{
+  "_id": {
+    "$oid": "67a52eaacbd9624f3aff556e"
+  },
+  "name": "Edwin Lemus",
+  "role": {
+    "$oid": "679bcfd7130e6b38e4544ca9"
+  },
+  "username": "edwinlemus",
+  "password": "$2a$10$1W6XOMx0ihq0PJlqGVg9VOwSf3s9OZCihAyp1I.ogKqge4J83hpg.",
+  "state": true,
+  "createdAt": {
+    "$date": "2025-02-06T21:50:34.571Z"
+  },
+  "updatedAt": {
+    "$date": "2025-02-06T21:50:34.571Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67a52f03cbd9624f3aff556f"
+  },
+  "name": "Ernesto Arias",
+  "role": {
+    "$oid": "679bcfd7130e6b38e4544ca9"
+  },
+  "username": "Ernestogodoy",
+  "password": "$2a$10$TL97heQpYxBZ7/X3/9JDeuNWJzGkEDHRgFLbgymL3HszQiHO9jhqS",
+  "state": true,
+  "createdAt": {
+    "$date": "2025-02-06T21:52:03.040Z"
+  },
+  "updatedAt": {
+    "$date": "2025-02-06T21:52:03.040Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67a52f4fcbd9624f3aff5570"
+  },
+  "name": "Duvan Camargo",
+  "role": {
+    "$oid": "679bcfd7130e6b38e4544ca9"
+  },
+  "username": "duvancamar",
+  "password": "$2a$10$22v/XLryP8yDAKPyki7DeumguwCDSofyZamWdkm65VP3INjdAfgQ.",
+  "state": true,
+  "createdAt": {
+    "$date": "2025-02-06T21:53:19.018Z"
+  },
+  "updatedAt": {
+    "$date": "2025-02-06T21:53:19.018Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "67a53065cbd9624f3aff5571"
+  },
+  "name": "Carlos Arias",
+  "role": {
+    "$oid": "679bcfbc130e6b38e4544ca7"
+  },
+  "username": "carlos",
+  "password": "$2a$10$B0ruShXGNhDU7Q.uQrmYRuHgbU6krJlbcTcqHXy6EBJEmTr9FQaVS",
+  "state": true,
+  "createdAt": {
+    "$date": "2025-02-06T21:57:57.501Z"
+  },
+  "updatedAt": {
+    "$date": "2025-02-06T21:57:57.501Z"
+  }
 }]

@@ -61,8 +61,8 @@ const ChatsProvider = ({ children }) => {
         token: cookies.token,
         chat: selectedChat,
       });
-      console.log(res);
-      setMessages(res.data);
+      setMessages(res.data.items);
+      console.log(messages);
     } catch (error) {
       console.error("Error in getMessages:", error.message); // Use console.error for errors
       setErrors(error.response?.data || error.message); // Improved error handling
@@ -71,15 +71,15 @@ const ChatsProvider = ({ children }) => {
 
   const addNewMessageInChat = (newMessage) => {
     try {
-      console.log(messages)
+      console.log(messages);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-      console.log(messages)
+      console.log(messages);
     } catch (error) {
       console.error("Error in addNewMessageInChat:", error.message);
       setErrors(error.response?.data || error.message);
     }
   };
-  
+
   const redirectChat = async (chat, redirect) => {
     try {
       const res = await chatRedirectUpdate({

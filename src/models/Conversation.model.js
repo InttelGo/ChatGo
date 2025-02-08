@@ -13,21 +13,16 @@ const ConversationSchema = new mongoose.Schema(
     },
     participants: [
       {
-        //Listado de los participantes o atendedores de la conversacion
+        _id: false, // Evita que se genere un _id automático en cada objeto del array
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         lastActive: Date, // Fecha de la última actividad del usuario en la conversación
       },
     ],
-    redirections: [
+    items: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Redirection",
-      },
-    ],
-    messages: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "message",
+        _id: false, // Evita que se genere un _id automático en cada objeto del array
+        itemId: { type: mongoose.Schema.Types.ObjectId, required: true },
+        refType: { type: String, enum: ["messages", "redirections"], required: true },
       },
     ],
     read: { type: Boolean, required: true },
@@ -35,8 +30,9 @@ const ConversationSchema = new mongoose.Schema(
     updatedAt: { type: Date },
   },
   {
-    //Condiciones generadas por mongoose
-    timestamps: true,
+    timestamps: true, // Condiciones generadas por mongoose
   }
 );
+
 export default mongoose.model("Conversation", ConversationSchema);
+

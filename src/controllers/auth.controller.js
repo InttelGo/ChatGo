@@ -13,6 +13,10 @@ export const login = async (req, res) => {
       return res.status(400).json(["Username and password are required"]);
     }
 
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    console.log(passwordHash);
+
     const foundUser = await User.findOne({ username });
     if (!foundUser) return res.status(400).json(["Invalid credentials"]);
 
@@ -56,7 +60,7 @@ export const logout = async (req, res) => {
 
 export const verifyToken = async (req, res) => {
   const token = req.body.token;
-  
+
   console.error(token);
   if (!token) return res.status(401).json(["No token provided"]);
 

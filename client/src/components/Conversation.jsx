@@ -3,6 +3,7 @@ import { useChats } from "../context/ChatsContext";
 import { useAuth } from "../context/AuthContext";
 import { useUsers } from "../context/UsersContext";
 import { PrimaryButtonOutline, PrimaryButton } from "./Buttons";
+import MessageList from "./MessageList";
 import UserModal from "./UserModal";
 import Logo from "../assets/img/Logo.png";
 
@@ -35,6 +36,7 @@ function Conversation() {
   const handlePersonClick = (user, area) => {
     setSelectedUser({ user: user, area: area });
     setTextValue("");
+    setIsGroupsInputVisible(false);
     setIsUserModalVisible(true); // Open the modal
   };
 
@@ -181,40 +183,9 @@ function Conversation() {
               )}
             </div>
           </div>
-          <div className="flex-grow-1 p-3 overflow-auto">
-            {/* Messages */}
-            <div className="d-flex flex-column">
-              {/* Messages */}
-              {messages.length > 0 ? (
-                messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`p-3 rounded mb-2 ${
-                      message.fromType !== "clients"
-                        ? "align-self-end bg-warning text-white"
-                        : "align-self-start bg-light"
-                    }`}
-                    style={{ maxWidth: "60%" }}
-                  >
-                    <p className="mb-1">{message.message}</p>
-                    <small
-                      className={
-                        message.fromType !== "clients"
-                          ? "text-white"
-                          : "text-muted"
-                      }
-                    >
-                      {new Date(message.createdAt).toLocaleTimeString()}
-                    </small>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center text-mu ted">No hay mensajes</p>
-              )}
-              {/* Elemento invisible para hacer scroll al final */}
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
+          {/* Message Section */}
+          <MessageList messages={messages} messagesEndRef= {messagesEndRef}/>
+
           {/* Input Section */}
           <div className="p-3 border-top d-flex">
             <PrimaryButtonOutline
@@ -227,14 +198,17 @@ function Conversation() {
               onClick={handleAttachFileClick}
               size={"2em"}
             />
-            {/* Ventana para adjuntar archivos (condicional) */}
+            {/* Ventana para redireccionar */}
             {isGroupsInputVisible && (
               <div
-                className="position-absolute bg-white p-2 rounded shadow m-2"
+                className="position-absolute bg-white p-2 rounded shadow"
                 style={{
-                  top: "67%",
-                  left: "43%",
-                  transform: "translateX(-100%)",
+                  top: "23em",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  maxWidth: "90vw",
+                  maxHeight: "50vh",
+                  overflowY: "auto",
                 }}
               >
                 <div
@@ -272,13 +246,17 @@ function Conversation() {
                 </div>
               </div>
             )}
+            {/*ventana para Subir Archivos */}
             {isFileInputVisible && (
               <div
-                className="position-absolute bg-white p-2 rounded shadow m-2"
+                className="position-absolute bg-white p-2 rounded shadow"
                 style={{
-                  top: "76%",
-                  left: "48%",
-                  transform: "translateX(-100%)",
+                  top: "28em",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  maxWidth: "90vw",
+                  maxHeight: "50vh",
+                  overflowY: "auto",
                 }}
               >
                 {/* Opción para documentos */}

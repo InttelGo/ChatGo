@@ -66,36 +66,48 @@ function ChatsList() {
       style={{ maxHeight: "40em", overflowY: "auto" }}
     >
       {chats && chats.length > 0 ? (
-        chats.map((chat) => (
-          <div
-            key={chat._id}
-            className="list-group-item list-group-item-action mb-3" // Added clickable class
-            style={{ background: "transparent", cursor: "pointer" }} // Added cursor style
-            onClick={() => handleClick(chat)} // Attach click handler
-          >
-            <div className="d-flex w-100 justify-content-between">
+        chats.map((chat) => {
+
+          const lastMessageToShow = chat.lastMessage; // Renombrado para mayor claridad
+
+          return (
+            <div
+              key={chat._id}
+              className="list-group-item list-group-item-action mb-3"
+              style={{ background: "transparent", cursor: "pointer" }}
+              onClick={() => handleClick(chat)}
+            >
+              <div className="d-flex w-100 justify-content-between">
+                <div>
+                  <h5>{formatPhoneNumber(chat.client?.number)}</h5>
+                </div>
+                <div className="d-flex align-items-center">
+                  <small className="text-muted">
+                    {moment(lastMessageToShow?.createdAt).fromNow()} {/* Usar lastMessageToShow */}
+                  </small>
+                  <span
+                    className="material-symbols-rounded mx-1"
+                    style={{ color: chat.read ? "#007BFC" : "#54656F" }}
+                  >
+                    done_all
+                  </span>
+                </div>
+              </div>
               <div>
-                <h5>{formatPhoneNumber(chat.client?.number)}</h5>
-              </div>
-              <div className="d-flex align-items-center">
                 <small className="text-muted">
-                  {moment(chat.lastMessage.createdAt).fromNow()}
+                  {/* Mostrar el mensaje o el motivo de redirección */}
+                  {lastMessageToShow?.typeMessage === "messages" ? (
+                    lastMessageToShow.message
+                  ) : lastMessageToShow?.typeMessage === "redirections" ? (
+                    `Redirección a ${lastMessageToShow.to}: ${lastMessageToShow.reason}` // Formato de redirección
+                  ) : (
+                    "Mensaje previo"
+                  )}
                 </small>
-                <span
-                  className="material-symbols-rounded mx-1"
-                  style={{ color: chat.read ? "#007BFC" : "#54656F" }}
-                >
-                  done_all
-                </span>
               </div>
             </div>
-            <div>
-              <small classNames="text-muted">
-                {chat.lastMessage?.message || "Mensaje previo"}
-              </small>
-            </div>
-          </div>
-        ))
+          );
+        })
       ) : (
         <div className="text-center">No hay chats disponibles</div>
       )}

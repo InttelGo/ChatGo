@@ -33,7 +33,7 @@ app.use("/webhook", webhookRoutes);
 app.use("/", authRoutes);
 app.use("/conversation", conversationRoutes);
 app.use("/conversation", messagesRoutes);
-app.use("/api", redirectRoutes);
+app.use("/conversation", redirectRoutes);
 app.use("/api", rolRoutes);
 app.use("/api", userRoutes);
 export default app;

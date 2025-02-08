@@ -8,4 +8,4 @@ export const chatRequestUpdate = (chat) =>
 
 export const messagesRequest = (chat) => axios.post(`/conversation/message/`, chat);
 
-export const chatRedirectUpdate = (chat) => axios.put(`/conversation/redict/`, chat);
+export const chatRedirectUpdate = (chat) => axios.put(`/conversation/redirect/`, chat);

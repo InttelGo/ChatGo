@@ -7,6 +7,6 @@ import {
 
 const router = Router();
 
-router.post("/redirect", authRequired, redirectTo);
+router.put("/redirect", authRequired, redirectTo);
 
 export default router;

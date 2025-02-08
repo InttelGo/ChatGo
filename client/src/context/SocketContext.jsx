@@ -42,10 +42,32 @@ export const SocketProvider = ({ children }) => {
       }
     });
 
+    socket.on("redirected", (res) =>{
+
+      console.log(res);
+      if (chats.message != "No hay conversaciones") {
+        //setRedirectInConversation(res.chat._id, res.redirect);
+      }
+      if (chat != null) {
+        if (res.conversationId === chat._id) {
+          setMessageInConversation(res.conversationId, res.newMessage);
+          getMessages({
+            _id: chat._id,
+            read: chat.read,
+            participants: chat.participants,
+            client: chat.client,
+            createdAt: chat.createdAt,
+            updatedAt: chat.updatedAt,
+          });
+        }
+      }
+    })
+
     // Limpiar el evento cuando el componente se desmonte
     return () => {
       socket.off("nueva_conversacion");
       socket.off("mensaje_nuevo");
+      socket.off("redirected");
     };
   }, [newChat, setMessageInConversation, chat]);
 
