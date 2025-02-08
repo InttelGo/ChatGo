@@ -4,6 +4,7 @@ import {
   chatRequestUpdate,
   messagesRequest,
   chatRedirectUpdate,
+  sendMessageRequest
 } from "../api/chats.js";
 import { useCookies } from "react-cookie";
 
@@ -124,6 +125,25 @@ const ChatsProvider = ({ children }) => {
     }
   };
 
+  const sendMessageUser = async (number, textValue) => {
+    console.log(textValue);
+    try {
+      const response = await sendMessageRequest(
+        {
+          messaging_product: "whatsapp",
+          to: number,
+          type: "text",
+          text: {
+            body: textValue
+          },
+        }
+      );
+
+      console.log("Mensaje enviado con éxito:", response.data);
+    } catch (error) {
+      console.error("Error enviando el mensaje:", error.response?.data || error);
+    }
+  }
   const newChat = (newChat) => {
     setChats((prevChats) => {
       let updatedChats = [...prevChats];
@@ -144,6 +164,7 @@ const ChatsProvider = ({ children }) => {
         setMessageInConversation,
         selectChat,
         messages,
+        sendMessageUser,
         addNewMessageInChat,
         getMessages,
         redirectChat,

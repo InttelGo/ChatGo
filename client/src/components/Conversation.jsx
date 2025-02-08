@@ -7,7 +7,7 @@ import UserModal from "./UserModal";
 import Logo from "../assets/img/Logo.png";
 
 function Conversation() {
-  const { chats, chat, messages, redirectChat } = useChats();
+  const { chats, chat, messages, redirectChat, sendMessageUser } = useChats();
   const { user } = useAuth();
   const { groups, getGroups } = useUsers();
   const [isGroupsInputVisible, setIsGroupsInputVisible] = useState(false);
@@ -21,6 +21,7 @@ function Conversation() {
     document: null,
     image: null,
   });
+
 
   const messagesEndRef = useRef(null);
 
@@ -74,32 +75,27 @@ function Conversation() {
     setIsFileInputVisible(!isFileInputVisible);
   };
 
-  const sendMessage = () => {};
+
 
   const handleFileUpload = (event, type) => {
     const file = event.target.files[0];
     if (file) {
-      /* 
-          setSelectedFiles((prevFiles) => ({
-            ...prevFiles,
-            [type]: file.name,
-          }));
-        */
+
+      setSelectedFiles((prevFiles) => ({
+        ...prevFiles,
+        [type]: file.name,
+      }));
+
     }
   };
 
   const handleMessageUpload = (event) => {
-    setMessageSend((prev) => {
-      const currentMessage = event.target.value;
+    setMessageSend(event.target.value);
+  };
 
-      if (currentMessage.length > 0) {
-        setSendMessageState(true);
-      } else {
-        setSendMessageState(false);
-      }
-
-      return currentMessage; // Retorna el nuevo valor para setMessageSend
-    });
+  const sendMessage = async () => {
+    console.log(messageSend); 
+    sendMessageUser(chat.client.number, messageSend);
   };
 
   const handleAttachSearchClick = () => {
@@ -189,11 +185,10 @@ function Conversation() {
                 messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`p-3 rounded mb-2 ${
-                      message.fromType !== "clients"
-                        ? "align-self-end bg-warning text-white"
-                        : "align-self-start bg-light"
-                    }`}
+                    className={`p-3 rounded mb-2 ${message.fromType !== "clients"
+                      ? "align-self-end bg-warning text-white"
+                      : "align-self-start bg-light"
+                      }`}
                     style={{ maxWidth: "60%" }}
                   >
                     <p className="mb-1">{message.message}</p>
