@@ -2,18 +2,13 @@ import mongoose from "mongoose";
 
 const MessageSchema = new mongoose.Schema(
   {
-    wmid: {
-      type:String,
-      required: true,
-      unique: true,
-    },
     from: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
     fromType: {  
       type: String,
-      enum: ['clients', 'users'], 
+      enum: ['users'], 
       required: true, 
     },
     message: {
@@ -27,4 +22,4 @@ const MessageSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("message", MessageSchema);
+export default mongoose.model("usermessage", MessageSchema);

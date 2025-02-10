@@ -14,6 +14,7 @@ const useRoles = () => {
 const RolesProvider = ({ children }) => {
   const [cookies] = useCookies(["token"]);
   const [roles, setRoles] = useState([]);
+  const [selectedRole, setSelectedRole] = useState(null);
   const [errors, setErrors] = useState([]);
 
   const getRoles = async () => {
@@ -27,7 +28,7 @@ const RolesProvider = ({ children }) => {
   };
 
   return (
-    <RoleContext.Provider value={{ getRoles, roles, errors }}>
+    <RoleContext.Provider value={{ getRoles, roles, errors, setSelectedRole, selectedRole}}>
       {children}
     </RoleContext.Provider>
   );

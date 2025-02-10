@@ -12,3 +12,5 @@ export const messagesRequest = (chat) => axios.post(`/conversation/message/`, ch
 export const chatRedirectUpdate = (chat) => axios.put(`/conversation/redirect/`, chat);
 
 export const sendMessageRequest = (data) => axiosMeta.post("", data);
+
+export const newMessagesUserRequest = (chat) => axios.post(`/conversation/newmessage/user`, chat);

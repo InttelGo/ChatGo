@@ -1,17 +1,16 @@
 import Role from "../models/Role.model.js";
 import Conversation from "../models/Conversation.model.js";
 import Client from "../models/Client.model.js";
-import Message from "../models/message.model.js";
+import ClientMessage from "../models/ClientMessage.model.js";
+import UserMessage from "../models/UserMessage.js";
 import Redirection from "../models/Redirection.model.js";
 import User from "../models/User.model.js";
 import { getIO } from "../io.js";
 
-
 export const newMessage = async (req, res) => {
   try {
+    console.log("Nueva entrada en WhatsApp");
     const { contacts, messages, changes } = req.body.entry[0].changes[0].value;
-    if (changes) console.log(changes);
-    console.log(req.body.entry[0].changes[0]);
     if (!contacts)
       return res.status(401).json(["No hay contactos en el mensaje"]);
 
@@ -54,13 +53,13 @@ export const newMessage = async (req, res) => {
         return res.status(401).json(["Error al guardar la conversacion"]);
     }
 
-    let message = await Message.findOne({ wmid: idMessage });
+    let message = await ClientMessage.findOne({ wmid: idMessage });
 
     if (message) {
       return res.status(200).json([client.name + " está viendo el chat"]);
     }
 
-    message = new Message({
+    message = new ClientMessage({
       wmid: idMessage,
       from: client._id,
       fromType: "clients",
@@ -73,8 +72,8 @@ export const newMessage = async (req, res) => {
       return res.status(401).json(["Error al guardar el mensaje"]);
     }
 
-    await Conversation.findByIdAndUpdate(conversation._id, {
-      $push: { items: { itemId: savedMessage._id, refType: "messages" } },
+    conversation = await Conversation.findByIdAndUpdate(conversation._id, {
+      $push: { items: { itemId: savedMessage._id, refType: "clientmessages" } },
     });
 
     const populatedConversation = await Conversation.findById(
@@ -86,7 +85,7 @@ export const newMessage = async (req, res) => {
     }
 
     const lastMessage = populatedConversation.items
-      .filter((item) => item.refType === "messages")
+      .filter((item) => item.refType === "clientmessages")
       .map((item) => item.itemId);
 
     const io = getIO();
@@ -147,7 +146,6 @@ export const getAllConversation = async (req, res) => {
       conversations.map(async (conversation) => {
         const client = await Client.findById(conversation.client);
 
-        // Poblar todos los items (sin ordenar aún)
         const populatedConversation = await Conversation.findById(
           conversation._id
         ).populate("items.itemId");
@@ -156,28 +154,30 @@ export const getAllConversation = async (req, res) => {
           return null;
         }
 
-        // Ordenar los items de forma ascendente por fecha de creación
         const sortedItems = populatedConversation.items.sort(
           (a, b) => a.itemId.createdAt - b.itemId.createdAt
         );
 
-        // Tomar el último elemento
-        const lastItem = sortedItems.length > 0 ? sortedItems[sortedItems.length - 1] : null;
+        const lastItem =
+          sortedItems.length > 0 ? sortedItems[sortedItems.length - 1] : null;
 
-        let lastMessage = null;
+        let lastMessageClient = null;
+        let lastMessageUser = null;
         let lastRedirection = null;
         let fromUser = null;
         let toUser = null;
 
         if (lastItem) {
-          if (lastItem.refType === "messages") {
-            lastMessage = await Message.findById(lastItem.itemId);
-          } else {
+          if (lastItem.refType === "clientmessages") {
+            lastMessageClient = await ClientMessage.findById(lastItem.itemId);
+          } else if (lastItem.refType === "redirections") {
             lastRedirection = await Redirection.findById(lastItem.itemId);
             if (lastRedirection) {
               fromUser = await User.findById(lastRedirection.from);
               toUser = await User.findById(lastRedirection.to);
             }
+          } else {
+            lastMessageUser = await UserMessage.findById(lastItem.itemId);
           }
         }
 
@@ -190,30 +190,41 @@ export const getAllConversation = async (req, res) => {
           },
           participants: conversation.participants,
           read: conversation.read,
-          lastMessage: lastMessage
+          lastMessage: lastMessageClient
             ? {
                 typeMessage: "messages",
-                from: lastMessage.from,
-                message: lastMessage.message,
-                type: lastMessage.type,
-                fromType: lastMessage.fromType,
-                createdAt: lastMessage.createdAt,
-                updatedAt: lastMessage.updatedAt,
-                wmid: lastMessage.wmid,
+                from: lastMessageClient.from,
+                message: lastMessageClient.message,
+                type: lastMessageClient.type,
+                fromType: lastMessageClient.fromType,
+                createdAt: lastMessageClient.createdAt,
+                updatedAt: lastMessageClient.updatedAt,
+                wmid: lastMessageClient.wmid,
               }
             : lastRedirection
             ? {
                 typeMessage: "redirections",
-                from: fromUser ? fromUser.name : "Desconocido",
-                to: toUser ? toUser.name : "Desconocido",
+                from: fromUser.name,
+                to: toUser.name,
                 reason: lastRedirection.reason,
                 createdAt: lastRedirection.createdAt,
                 updatedAt: lastRedirection.updatedAt,
+              }
+            : lastMessageUser
+            ? {
+                typeMessage: "messages",
+                from: lastMessageUser.from,
+                message: lastMessageUser.message,
+                type: lastMessageUser.type,
+                fromType: lastMessageUser.fromType,
+                createdAt: lastMessageUser.createdAt,
+                updatedAt: lastMessageUser.updatedAt,
               }
             : null,
         };
       })
     );
+    console.log(populatedConversations);
     res.status(201).json(populatedConversations);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener las conversaciones" });
@@ -221,26 +232,7 @@ export const getAllConversation = async (req, res) => {
   }
 };
 
-export const getConversation = async (req, res) => {
-  const { number, description, foto, message } = req.body;
-  try {
-    // Encontrar el cliente por numero
-    const client = await Client.findOne({ number: number });
-
-    // Delegate logic based on whether the client exists
-    const newMessage = await existingClient(client, message);
-    if (!newMessage)
-      return await newClient(number, description, foto, message, res);
-
-    return res.json(newMessage);
-  } catch (error) {
-    res.status(500).json({ message: "Error al enviar el mensaje" });
-    return null;
-  }
-};
-
 export const updateConversation = async (req, res) => {
-  console.log(req.body);
   const { conversation } = req.body;
   try {
     const updatedConversation = await Conversation.findByIdAndUpdate(
@@ -252,6 +244,11 @@ export const updateConversation = async (req, res) => {
       },
       { new: true }
     );
+    console.log(updatedConversation);
+    if (!updatedConversation)
+      return res.status(404).json(["Conversacion no encontrada"]);
+
+    res.status(200).json(["Actualizado con exito"]);
   } catch (error) {
     res.status(500).json(["Error al actualizar la conversacion"]);
   }

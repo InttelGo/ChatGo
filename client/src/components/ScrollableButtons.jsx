@@ -4,7 +4,7 @@ import { useChats } from "../context/ChatsContext";
 
 const ScrollableButtons = () => {
   const scrollContainerRef = useRef(null);
-  const { getRoles, roles } = useRoles();
+  const { getRoles, roles, setSelectedRole } = useRoles();
   const { getChats } = useChats();
   const [activeButton, setActiveButton] = useState(null);
   const [isSeeGroup, setIsSeeGroup] = useState(0);
@@ -19,6 +19,7 @@ const ScrollableButtons = () => {
   useEffect(() => {
     if (roles.length > 0 && !activeButton) {
       setActiveButton(roles[0]._id);
+      setSelectedRole(roles[0]._id);
       getChats(roles[0]._id, isSeeGroup);
     }
   }, [roles]);

@@ -4,7 +4,8 @@ import {
   chatRequestUpdate,
   messagesRequest,
   chatRedirectUpdate,
-  sendMessageRequest
+  sendMessageRequest,
+  newMessagesUserRequest,
 } from "../api/chats.js";
 import { useCookies } from "react-cookie";
 
@@ -22,8 +23,14 @@ const ChatsProvider = ({ children }) => {
   const [cookies] = useCookies(["token"]);
   const [chats, setChats] = useState([]);
   const [errors, setErrors] = useState([]);
+  const [success, setSuccess] = useState([]);
   const [chat, setchat] = useState(null);
+  const [filteredChats, setFilteredChats] = useState([]);
   const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    setFilteredChats(chats); // Inicialmente, los chats filtrados son todos los chats
+  }, [chats]);
 
   const getChats = async (idRole, filter) => {
     try {
@@ -45,14 +52,13 @@ const ChatsProvider = ({ children }) => {
         token: cookies.token,
         conversation: conversation,
       });
-      setchat(res);
     } catch (error) {
       console.error("Error in updateChat:", error.message); // Use console.error for errors
       setErrors(error.response?.data || error.message); // Improved error handling
     }
   };
 
-  const selectChat = async (selectedChat) => {
+  const selectChat = (selectedChat) => {
     setchat(selectedChat);
   };
 
@@ -63,7 +69,6 @@ const ChatsProvider = ({ children }) => {
         chat: selectedChat,
       });
       setMessages(res.data.items);
-      console.log(messages);
     } catch (error) {
       console.error("Error in getMessages:", error.message); // Use console.error for errors
       setErrors(error.response?.data || error.message); // Improved error handling
@@ -72,9 +77,7 @@ const ChatsProvider = ({ children }) => {
 
   const addNewMessageInChat = (newMessage) => {
     try {
-      console.log(messages);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
-      console.log(messages);
     } catch (error) {
       console.error("Error in addNewMessageInChat:", error.message);
       setErrors(error.response?.data || error.message);
@@ -88,22 +91,36 @@ const ChatsProvider = ({ children }) => {
         conversation: chat,
         redirections: redirect,
       });
-      console.log(res.data);
+
+      if (res.status === 201) {
+        setchat(null);
+      }
     } catch (error) {
       console.error("Error in redirectChat:", error.message); // Use console.error for errors
       setErrors(error.response?.data || error.message); // Improved error handling
     }
   };
 
+  const searchChats = async (search) =>{
+    if(!search){
+      setFilteredChats(chats)
+    }else{
+      const results = chats.filter((chat) => {
+        if (chat.client && chat.client.number && chat.client.number.toString().toLowerCase().includes(search)) {
+          return true;
+        }
+        return false;
+      });
+    
+      setFilteredChats(results);
+    }
+  }
+
   const setMessageInConversation = async (idChat, newMessage) => {
     try {
       setChats((prevChats) => {
-        // Verificar si prevChats es un array, si no, asignar un array vacío
         const updatedChats = Array.isArray(prevChats) ? [...prevChats] : [];
-
-        // Encontrar el índice del chat en la lista
         const index = updatedChats.findIndex((chat) => chat._id === idChat);
-
         if (index !== -1) {
           // Extraer el chat, actualizarlo y moverlo al principio
           let chatToUpdate = { ...updatedChats[index] };
@@ -119,31 +136,58 @@ const ChatsProvider = ({ children }) => {
 
         return updatedChats;
       });
+      console.log(chat);
     } catch (error) {
       console.error("Error in setMessageInConversation:", error.message);
       setErrors(error.response?.data || error.message);
     }
   };
 
-  const sendMessageUser = async (number, textValue) => {
-    console.log(textValue);
+  const sendMessageUser = async (chat, message) => {
     try {
-      const response = await sendMessageRequest(
-        {
-          messaging_product: "whatsapp",
-          to: number,
-          type: "text",
-          text: {
-            body: textValue
-          },
-        }
-      );
+      let response = await sendMessageRequest({
+        messaging_product: "whatsapp",
+        to: chat.client.number,
+        type: "text",
+        text: {
+          body: message,
+        },
+      });
+
+      if (response.status != 200) {
+        console.log("Error enviando el mensaje:", response.data);
+        return;
+      }
+
+      console.log(chat, message)
+
+      response = newMessagesUserRequest({
+        token: cookies.token,
+        chat: chat,
+        message: message,
+      });
+
+      if (response.status != 200) {
+        console.log("Error al guardar el mensaje:", response.data);
+        return;
+      }
 
       console.log("Mensaje enviado con éxito:", response.data);
     } catch (error) {
-      console.error("Error enviando el mensaje:", error.response?.data || error);
+      console.error(
+        "Error enviando el mensaje:",
+        error.response?.data || error
+      );
     }
-  }
+  };
+
+  const deleteChatToChats = (chatId) => {
+    console.log(chats.filter((chat) => chat._id !== chatId));
+    setChats((prevChats) => {
+      return prevChats.filter((chat) => chat._id !== chatId);
+    });
+  };
+
   const newChat = (newChat) => {
     setChats((prevChats) => {
       let updatedChats = [...prevChats];
@@ -160,11 +204,16 @@ const ChatsProvider = ({ children }) => {
         chats,
         chat,
         errors,
+        deleteChatToChats,
+        success,
+        setSuccess,
         updateConversation,
         setMessageInConversation,
         selectChat,
         messages,
+        filteredChats,
         sendMessageUser,
+        searchChats,
         addNewMessageInChat,
         getMessages,
         redirectChat,

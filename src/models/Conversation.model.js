@@ -8,8 +8,8 @@ const ConversationSchema = new mongoose.Schema(
       required: true,
     },
     client: {
-      type: String,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Client",
     },
     participants: [
       {
@@ -22,7 +22,11 @@ const ConversationSchema = new mongoose.Schema(
       {
         _id: false, // Evita que se genere un _id automático en cada objeto del array
         itemId: { type: mongoose.Schema.Types.ObjectId, required: true },
-        refType: { type: String, enum: ["messages", "redirections"], required: true },
+        refType: {
+          type: String,
+          enum: ["clientmessages", "usermessages", "redirections"],
+          required: true,
+        },
       },
     ],
     read: { type: Boolean, required: true },
@@ -35,4 +39,3 @@ const ConversationSchema = new mongoose.Schema(
 );
 
 export default mongoose.model("Conversation", ConversationSchema);
-

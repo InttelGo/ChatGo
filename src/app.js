@@ -10,7 +10,6 @@ import rolRoutes from "./routes/role.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import redirectRoutes from "./routes/redirecction.routes.js";
 import cors from "cors";
-import sendMessage from "./routes/whatsappRoutes.js";
 
 
 
@@ -33,8 +32,6 @@ app.use(CookieParser());
 
 //webhook
 app.use("/webhook", webhookRoutes);
-//send
-app.use("/send", sendMessage);
 
 app.use("/", authRoutes);
 app.use("/conversation", conversationRoutes);

@@ -15,10 +15,10 @@ const MessageList = ({ messages }) => {
         key={index}
         className={`p-3 rounded shadow-sm my-2 ${
           message.fromType !== "clients"
-            ? "align-self-end bg-warning text-white"
+            ? "align-self-end text-white"
             : "align-self-start bg-light"
         }`}
-        style={{ maxWidth: "60%", borderRadius: "15px" }}
+        style={{ maxWidth: "60%", borderRadius: "15px", background: message.fromType != "clients" ? "#ff9900" : ""}}
       >
         <p className="mb-1">{message.message}</p>
         <small

@@ -12,6 +12,9 @@ export const SocketProvider = ({ children }) => {
     chats,
     chat,
     getChats,
+    setSuccess,
+    success,
+    deleteChatToChats
   } = useChats();
 
   useEffect(() => {
@@ -25,7 +28,9 @@ export const SocketProvider = ({ children }) => {
 
     socket.on("mensaje_nuevo", (res) => {
       if (chats.message != "No hay conversaciones") {
+        console.log(res);
         setMessageInConversation(res.conversationId, res.newMessage);
+        
       }
       if (chat != null) {
         if (res.conversationId === chat._id) {
@@ -42,26 +47,21 @@ export const SocketProvider = ({ children }) => {
       }
     });
 
-    socket.on("redirected", (res) =>{
-
+    socket.on("redirected", (res) => {
       console.log(res);
       if (chats.message != "No hay conversaciones") {
-        //setRedirectInConversation(res.chat._id, res.redirect);
+        setMessageInConversation(res.chatId, res.lastItem);
+        deleteChatToChats(res.chatId);
       }
-      if (chat != null) {
-        if (res.conversationId === chat._id) {
-          setMessageInConversation(res.conversationId, res.newMessage);
-          getMessages({
-            _id: chat._id,
-            read: chat.read,
-            participants: chat.participants,
-            client: chat.client,
-            createdAt: chat.createdAt,
-            updatedAt: chat.updatedAt,
-          });
-        }
-      }
-    })
+      setSuccess([...success,
+        {
+          client: res.client,
+          from: res.lastItem.from,
+          to: res.lastItem.to,
+          reason: res.lastItem.reason,
+        },
+      ]);
+    });
 
     // Limpiar el evento cuando el componente se desmonte
     return () => {
