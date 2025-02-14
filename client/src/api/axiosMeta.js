@@ -3,7 +3,7 @@ import axios from "axios";
 const instance = axios.create({
   baseURL: "https://graph.facebook.com/v21.0/500922633112793/messages",
   headers: {
-    Authorization: `Bearer EAAXdoAuWvzIBO65JLbnwZAj05ZCZBgr00G7KQUUgJDGZCtwQhQayEUDmbLl9916ox5JsB9iUgRR3n9vpN8EZA31dMdqzKfYZBOz4G4WKPkHX85ZCwXrlabiw3FuQordlanQBKpfEGWxWSk86RRdIp39dpxXFSLhRkzFc6vOXhGWrXhMf3woaAWfWwTRTabYFtJXdP5H7aJO0hStWbIUGmgpYPUQaNkZD`,
+    Authorization: `Bearer EAAXdoAuWvzIBOzPOL1tHXGiTONZBVzR48Yq8otysDwrR3pQyGjwxHbOZAONyxVLcml9M7K4ZBVOvpAxzrCoqK3LvHtKOpEsAhhYrgoTUyHUI9lmBdM0udG6tZChhUl1xjI2qrPhDZAQxHKSpInh3ECd5JFquYZBFMJ7pZAdMbPGNdDLcZA8Xk2JfrzzpEmJTE9heHAZDZD`,
     "Content-Type": "application/json",
   },
 });

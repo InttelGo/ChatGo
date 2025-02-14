@@ -1,0 +1,11 @@
+-----------------------------------
+-- CREDENCIALES META
+-----------------------------------
+CORREO = comercialinttelgo@gmail.com
+PASSWORD = departamento
+
+-----------------------------------
+-- WHATSAPP
+-----------------------------------
+
+TOKEN = EAAXdoAuWvzIBOzPOL1tHXGiTONZBVzR48Yq8otysDwrR3pQyGjwxHbOZAONyxVLcml9M7K4ZBVOvpAxzrCoqK3LvHtKOpEsAhhYrgoTUyHUI9lmBdM0udG6tZChhUl1xjI2qrPhDZAQxHKSpInh3ECd5JFquYZBFMJ7pZAdMbPGNdDLcZA8Xk2JfrzzpEmJTE9heHAZDZD

@@ -9,7 +9,7 @@ import { getIO } from "../io.js";
 
 export const newMessage = async (req, res) => {
   try {
-    console.log("Nueva entrada en WhatsApp");
+    console.log(req.body);
     const { contacts, messages, changes } = req.body.entry[0].changes[0].value;
     if (!contacts)
       return res.status(401).json(["No hay contactos en el mensaje"]);
